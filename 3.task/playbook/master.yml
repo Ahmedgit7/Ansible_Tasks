@@ -1,0 +1,6 @@
+---
+- name: Install nginx using role
+  hosts: demo
+  roles:
+    - webserver
+

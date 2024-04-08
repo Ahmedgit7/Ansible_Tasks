@@ -1,0 +1,36 @@
+---
+- name: Install and configure Nginx
+  hosts: demo
+  become: yes  # Run tasks with sudo privileges
+
+  tasks:
+    - name: Install Nginx from Amazon Linux Extras
+      command: sudo amazon-linux-extras install nginx1 -y
+      register: nginx_install_status
+      changed_when: "'installed' in nginx_install_status.stdout"
+
+    - name: Start Nginx service
+      service:
+        name: nginx
+        state: started
+      when: nginx_install_status.changed  # Only start if nginx was installed
+
+    - name: Enable Nginx service on boot
+      service:
+        name: nginx
+        enabled: yes
+        state: started  # Ensure nginx is started on boot
+      when: nginx_install_status.changed  # Only enable if nginx was installed
+
+    - name: Copy new index.html file
+      copy:
+        src: /home/Ahmed/ansible_tasks/index.html  # Path to your new index.html file on the master server
+        dest: /usr/share/nginx/html/index.html  # Path where Nginx serves the index.html file
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+

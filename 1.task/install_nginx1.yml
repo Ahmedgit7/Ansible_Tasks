@@ -1,0 +1,19 @@
+---
+- hosts: demo
+  user: Ahmed
+  become: yes
+  connection: ssh
+  gather_facts: yes
+
+  tasks:
+    - name: Install nginx Server 
+      yum:
+        name: nginx
+        state: present  # Ensure httpd is present
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes  
+
